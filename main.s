@@ -7,29 +7,50 @@
 
 .data
 	newline:                .asciz "\n"
+	input_specifier:		.asciz "%d %d %c"
+	decimal_specifier:      .asciz "%d"
 
-	decimal_specificer:     .asciz "%d"
-	int_a_buffer:			.space 4
-	int_b_buffer:			.space 4
-
-	char_specifier:      	.asciz "%c"
-	char_buffer: 			.space 1
+	int_a_input_buffer:		.space 4
+	int_b_input_buffer:		.space 4
+	char_input_buffer: 		.space 1
 
 .global main
 .text
 
 main:
-	ldr x0, =char_specificer
-	ldr x1, =char_buffer
+	//Take user input
+	ldr x0, =input_specifier
+	ldr x1, =int_a_input_buffer
+	ldr x2, =int_b_input_buffer
+	ldr x3, =char_input_buffer
 	bl scanf
 
-	ldr x1, =char_buffer
+	//Load registers with their values from the saved addresses
+	ldr x1, =int_a_input_buffer
+	ldr x1, [x1]
+	ldr x2, =int_b_input_buffer
+	ldr x2, [x2]
+	ldr x3, =char_input_buffer
+
+
+
+	ldr x0, =decimal_specifier
+	bl DIV
+
+ADD:
+	add x1, x1, x2
 	bl printf
 
-	ldr x0, =newLine
-	bl printf
+SUB:
+
+MUL:
+
+DIV:
+	cbz x2, exit
 
 exit:
+	ldr x0, =newline
+	bl printf
 	mov x0, #0
 	mov x8, #93
 	svc #0
