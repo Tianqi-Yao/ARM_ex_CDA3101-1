@@ -9,15 +9,14 @@
 	newline:                .asciz "\n"
 	input_specifier:		.asciz "%d %d %c"
 	decimal_specifier:      .asciz "%d"
+	string_specifier: 		.asciz "%s"
 
 	int_a_input_buffer:		.space 4
 	int_b_input_buffer:		.space 4
 	char_input_buffer: 		.space 1
 
-	add_char:				.asciz "+"
-	sub_char:				.asciz "-"
-	mul_char:				.asciz "*"
-	div_char:				.asciz "/"
+	operator_err_message: 	.asciz "That is not a valid operator"
+	div_err_message:		.asciz "Divide by 0 error"
 
 .global main
 .text
@@ -31,45 +30,69 @@ main:
 	bl scanf
 
 	//Load registers with their values from the saved addresses
-	ldr x0, =decimal_specifier
-	ldr x1, =int_a_input_buffer
-	ldr x1, [x1]
-	ldr x2, =int_b_input_buffer
-	ldr x2, [x2]
+	ldr x19, =int_a_input_buffer
+	ldr x19, [x19]
+	ldr x20, =int_b_input_buffer
+	ldr x20, [x20]
 	ldr x3, =char_input_buffer
+	ldrb w21, [x3, #0]
 
-	//If input char is + add
-	cmp	x3, add_char
+	//If char is +, add a and b
+	cmp w21, #43
 	beq ADD
 
-	//If input char is - subtract
-	cmp	x3, sub_char
+	//If char is -, subtract b from a
+	cmp w21, # 45
 	beq SUB
 
-	//If input char is * multiply
-	cmp	x3, mul_char
+	//If char is *, mutiply a by b
+	cmp w21, #42
 	beq MUL
 
-	//If input char is / divide
-	cmp	x3, div_char
+	//If char is /, divide a by b
+	cmp w21, #47
 	beq DIV
 
-ADD:
-	add x1, x1, x2
+	//If this is reached, a valid operator was not used
+	ldr x0, =operator_err_message
 	bl printf
+	b exit
+
+ADD:
+	ldr x0, =decimal_specifier
+	add x1, x19, x20
+	bl printf
+	b exit
 
 SUB:
-	sub x1, x1, x2
+	ldr x0, =decimal_specifier
+	sub x1, x19, x20
 	bl printf
+	b exit
 
 MUL:
-	mul x1, x1, x2
+	ldr x0, =decimal_specifier
+	mul x1, x19, x20
 	bl printf
+	b exit
 
 DIV:
-	cbz x2, exit
-	//div x1, x1, x2
+	//Trynna catch 0 b vars
+	//cbz x20, DIV_BY_ZERO
+	//sub x0, x20, #0
+	//cbz x0, DIV_BY_ZERO
+
+	//Checking b arg
+	//ldr x0, =decimal_specifier
+	//mov x1, x20
+	//bl printf
+
+	b exit
+
+DIV_BY_ZERO:
+	ldr x0, =div_err_message
 	bl printf
+	b exit
 
 exit:
 	ldr x0, =newline
