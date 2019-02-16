@@ -11,8 +11,8 @@
 	decimal_specifier:      .asciz "%d"
 	string_specifier: 		.asciz "%s"
 
-	int_a_input_buffer:		.space 4
-	int_b_input_buffer:		.space 4
+	int_a_input_buffer:		.word 0
+	int_b_input_buffer:		.word 0
 	char_input_buffer: 		.space 1
 
 	operator_err_message: 	.asciz "That is not a valid operator"
@@ -29,7 +29,7 @@ main:
 	ldr x3, =char_input_buffer
 	bl scanf
 
-	//Load registers with their values from the saved addresses
+	//Load registers from corresponding buffers
 	ldr x19, =int_a_input_buffer
 	ldr x19, [x19]
 	ldr x20, =int_b_input_buffer
@@ -77,16 +77,12 @@ MUL:
 	b exit
 
 DIV:
-	//Trynna catch 0 b vars
-	//cbz x20, DIV_BY_ZERO
-	//sub x0, x20, #0
-	//cbz x0, DIV_BY_ZERO
+	//Check if b is a zero
+	cbz w20, DIV_BY_ZERO
 
-	//Checking b arg
-	//ldr x0, =decimal_specifier
-	//mov x1, x20
-	//bl printf
-
+	ldr x0, =decimal_specifier
+	sdiv w1, w19, w20
+	bl printf
 	b exit
 
 DIV_BY_ZERO:
