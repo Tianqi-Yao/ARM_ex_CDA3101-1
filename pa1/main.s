@@ -37,6 +37,16 @@ main:
 	ldr x3, =char_input_buffer
 	ldrb w21, [x3, #0]
 
+	//Select the corresponding operator
+	bl OPERATOR
+
+	//Print output when the corresponding operator subroutine returns
+	ldr x0, =decimal_specifier
+	mov x1, x21
+	bl printf
+	b exit
+
+OPERATOR:
 	//If char is +, add a and b
 	cmp w21, #43
 	beq ADD
@@ -59,31 +69,23 @@ main:
 	b exit
 
 ADD:
-	ldr x0, =decimal_specifier
-	add x1, x19, x20
-	bl printf
-	b exit
+	add x21, x19, x20
+	br x30
 
 SUB:
-	ldr x0, =decimal_specifier
-	sub x1, x19, x20
-	bl printf
-	b exit
+	sub x21, x19, x20
+	br x30
 
 MUL:
-	ldr x0, =decimal_specifier
-	mul x1, x19, x20
-	bl printf
-	b exit
+	mul x21, x19, x20
+	br x30
 
 DIV:
 	//Check if b is a zero
 	cbz w20, DIV_BY_ZERO
 
-	ldr x0, =decimal_specifier
-	sdiv w1, w19, w20
-	bl printf
-	b exit
+	sdiv w21, w19, w20
+	br x30
 
 DIV_BY_ZERO:
 	ldr x0, =div_err_message
