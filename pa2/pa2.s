@@ -21,18 +21,21 @@ main:
 	bl scanf
 
 	ldr x19, =input_buffer
-	mov x20, #4 //Get string length
+	mov x20, #0
 
 	loop:
-		sub x20, x20, #1
 		ldrb w21, [x19, x20]
+		cbz w21, exit_loop
+
 		bl check_vowels
 		strb w21, [x19, x20]
-		cbnz x20, loop
+		add x20, x20, #1
+		b loop
 
-	mov x0, x19
-	bl printf
-	b exit
+	exit_loop:
+		mov x0, x19
+		bl printf
+		b exit
 
 check_vowels:
 	cmp w21, #97
@@ -53,7 +56,7 @@ check_vowels:
 	br x30
 
 void_char:
-	ldr x21, #120 //Replace with x
+	ldr w21, =voided_char
 	br x30
 
 exit:
