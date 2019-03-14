@@ -21,36 +21,39 @@ main:
 	bl scanf
 
 	ldr x19, =input_buffer
-	//Empty string in x20
-	//Loop through the string
-		//Save curr char in x21
-		//Branch to check_vowels
-		//Append whatever val in x21 to string in x20
-	//Print string in x20
+	mov x20, #4 //Get string length
 
-	bl check_vowels
+	loop:
+		sub x20, x20, #1
+		ldrb w21, [x19, x20]
+		bl check_vowels
+		strb w21, [x19, x20]
+		cbnz x20, loop
+
+	mov x0, x19
+	bl printf
 	b exit
 
 check_vowels:
-	cmp x21, #97
+	cmp w21, #97
 	beq void_char
 
-	cmp x21, #101
+	cmp w21, #101
 	beq void_char
 
-	cmp x21, #105
+	cmp w21, #105
 	beq void_char
 
-	cmp x21, #111
+	cmp w21, #111
 	beq void_char
 
-	cmp x21, #117
+	cmp w21, #117
 	beq void_char
 
 	br x30
 
 void_char:
-	ldr x20, =voided_char
+	ldr x21, #120 //Replace with x
 	br x30
 
 exit:
